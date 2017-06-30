@@ -11,6 +11,9 @@ setup(
         'jinja2',
         'pyyaml',
     ],
+    tests_require=[
+        'nose',
+    ],
     entry_points='''
         [console_scripts]
         tbd=tbd:main

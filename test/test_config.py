@@ -52,39 +52,8 @@ stacks:
             }
         }).regions
 
-        self.assertEqual(actual, ['us-west-2', 'us-east-2'])
+        self.assertEqual(sorted(actual), sorted(['us-west-2', 'us-east-2']))
 
     def test_regions_empty(self):
         actual = Config(data={'stacks': {}}).regions
         self.assertEqual(actual, [])
-
-    def test_stacks(self):
-        actual = Config(data={
-            'stacks': {
-                'us-west-2': {
-                    'vpc': {
-                        'template': 'templates/vpc.yml'
-                    }
-                },
-                'us-east-2': {
-                    'vpc': {
-                        'template': 'templates/vpc.yml'
-                    }
-                }
-            }
-        }).stacks
-
-        expected = [
-            Stack(
-                region='us-west-2',
-                name='vpc',
-                template='templates/vpc.yml'
-            ),
-            Stack(
-                region='us-east-2',
-                name='vpc',
-                template='templates/vpc.yml'
-            ),
-        ]
-
-        self.assertListEqual(actual, expected)
