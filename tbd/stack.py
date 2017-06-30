@@ -1,6 +1,3 @@
-import boto3
-
-
 class Stack(object):
     def __init__(self, region, name, template, parameters={}):
         self.region = region
