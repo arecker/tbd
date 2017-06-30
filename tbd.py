@@ -3,14 +3,36 @@ import os
 import boto3
 import botocore
 import click
-import yaml
+import jinja2
+import yaml as yamllib
+
+
+jinjaenv = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.getcwd())
+)
+
+
+def ref(refname):
+    return {'Ref': refname}
+
+
+def tags(**kwargs):
+    return [{'Key': k, 'Value': v} for k, v in kwargs.items()]
+
+
+def yaml(data):
+    return yamllib.dump(data, default_flow_style=True)
+
+
+jinjaenv.globals.update(ref=ref, tags=tags)
+jinjaenv.filters.update(yaml=yaml)
 
 
 class Config(object):
     def __init__(self, path=None):
         path = path or os.path.join(os.getcwd(), 'tbd.yml')
         with open(path, 'r') as f:
-            self.data = yaml.load(f)
+            self.data = yamllib.load(f)
 
     @property
     def regions(self):
@@ -25,6 +47,12 @@ class Config(object):
                 for name, info in stackdata.items():
                     self._stacks.append(Stack(region, name, info))
         return self._stacks
+
+    def get_stack(self, name):
+        try:
+            return filter(lambda s: s.name == name, self.stacks)[0]
+        except IndexError:
+            return None
 
     def apply(self):
         for stack in self.stacks:
@@ -48,8 +76,9 @@ class Stack(object):
         return boto3.client('cloudformation', region_name=self.region)
 
     def read_template_as_string(self):
-        with open(self.template, 'rb') as f:
-            return f.read()
+        compiled = jinjaenv.get_template(self.template).render()
+        serialized = yamllib.load(compiled)
+        return yamllib.dump(serialized)
 
     @property
     def exists(self):
@@ -112,6 +141,13 @@ def apply():
 @main.command()
 def destroy():
     Config().destroy()
+
+
+@main.command(name='print')
+@click.argument('stack')
+def print_template(stack):
+    stack = Config().get_stack(stack)
+    print(stack.read_template_as_string())
 
 
 if __name__ == '__main__':

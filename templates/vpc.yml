@@ -3,7 +3,4 @@ Resources:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 10.0.0.0/16
-      Tags:
-        - Key: Name
-          Value:
-            Ref: AWS::StackName
+      Tags: {{ tags(Name=ref('AWS::StackName')) | yaml }}
