@@ -1,4 +1,0 @@
-stacks:
-  us-east-2:
-    test-stack:
-      template: templates/vpc.yml

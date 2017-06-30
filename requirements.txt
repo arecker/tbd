@@ -1,4 +1,0 @@
-boto3
-Click
-jinja2
-PyYaml
