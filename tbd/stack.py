@@ -1,10 +1,6 @@
 import boto3
 
 
-resource = boto3.resource('cloudformation')
-client = boto3.client('cloudformation')
-
-
 class Stack(object):
     def __init__(self, region, name, template, parameters={}):
         self.region = region
