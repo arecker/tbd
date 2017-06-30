@@ -29,7 +29,7 @@ def register_constant(key, value):
 
 def prettify_json(content):
     data = jsonlib.loads(content)
-    return jsonlib.dumps(data, indent=4)
+    return jsonlib.dumps(data, indent=2)
 
 
 def prettify_yaml(content):
@@ -64,7 +64,7 @@ def yaml(data):
 
 @register_filter
 def json(data):
-    return json.dumps(data)
+    return jsonlib.dumps(data)
 
 
 @register_function
