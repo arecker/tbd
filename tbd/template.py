@@ -1,11 +1,11 @@
-import sys
 import functools
 import importlib
+import os
+import sys
 
 import jinja2
-from yaml import dump as yaml_dump
-from json import dumps as json_dump
-
+import yaml as yamllib
+import json as jsonlib
 
 _REGISTERED = {}
 _REGISTERED_FILTERS = {}
@@ -27,6 +27,23 @@ def register_constant(key, value):
     _REGISTERED[key] = value
 
 
+def prettify_json(content):
+    data = jsonlib.loads(content)
+    return jsonlib.dumps(data, indent=4)
+
+
+def prettify_yaml(content):
+    data = yamllib.load(content)
+    return yamllib.dump(data, default_flow_style=False)
+
+
+def prettify(ext, content):
+    if ext in ['.yml', '.yaml']:
+        return prettify_yaml(content)
+    if ext in ['.js', '.json']:
+        return prettify_json(content)
+
+
 def render(path, template_dir, helpers_path=None, helpers_import='helpers'):
     sys.dont_write_bytecode = True
     sys.path.append(helpers_path or template_dir)
@@ -35,17 +52,19 @@ def render(path, template_dir, helpers_path=None, helpers_import='helpers'):
     environment = jinja2.Environment(loader=loader)
     environment.globals.update(_REGISTERED)
     environment.filters.update(_REGISTERED_FILTERS)
-    return environment.get_template(path).render()
+    content = environment.get_template(path).render()
+    _, ext = os.path.splitext(path)
+    return prettify(ext, content)
 
 
 @register_filter
 def yaml(data):
-    return yaml_dump(data, default_flow_style=True)
+    return yamllib.dump(data, default_flow_style=True)
 
 
 @register_filter
 def json(data):
-    return json_dump(data)
+    return json.dumps(data)
 
 
 @register_function
