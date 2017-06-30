@@ -4,7 +4,7 @@
 
 Write CloudFormation templates with jinja2.
 
-```json
+```
 {
   "Resources": {
     "Vpc": {
