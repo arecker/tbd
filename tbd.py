@@ -14,9 +14,7 @@ class Config(object):
 
     @property
     def regions(self):
-        if not getattr(self, '_regions', None):
-            self._regions = self.data.get('stacks', {}).keys()
-        return self._regions
+        return self.data.get('stacks', {}).keys()
 
     @property
     def stacks(self):
